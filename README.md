@@ -1,4 +1,4 @@
-'''IMPORTANT! IMPORTANT! IMPORTANT!'''
+**IMPORTANT! IMPORTANT! IMPORTANT!**
 
 Summary of what needs to be submitted
 -Your updated Weather Application (HTML/CSS/JS) that presents the information of your assigned city with changed URL of API (the actual files containing the code, NOT a screenshot)
