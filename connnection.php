@@ -2,7 +2,7 @@
 $serverName = "localhost";
 $userName = "root";
 $password = "";
-$api_key = "8e67b2065f4c070146565abbdcbc8616";
+$api_key = "API_KEY";
 $conn = mysqli_connect($serverName, $userName, $password);
 
 if($conn) {
@@ -109,4 +109,5 @@ header('Content-Type: application/json');
 echo $json_data;
 
 mysqli_close($conn);
+
 ?>
