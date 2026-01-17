@@ -1,6 +1,4 @@
-let city = "Janakpur Dham";
-//According to google, Janakpur is also known as Janakpur Dham
-
+let city = "Your_Assigned_city";
 async function fetchWeatherData(searchCity) {
     try {
         const api_URL = `http://localhost/prototype_2/connnection.php?q=${searchCity}`;
@@ -51,4 +49,5 @@ document.getElementById("searchButton").addEventListener("click", function() {
     } else {
         document.getElementById("errorMsg").innerHTML = "Please enter a city name.";
     }
+
 });
