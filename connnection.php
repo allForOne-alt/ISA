@@ -12,7 +12,9 @@ else {
     // echo "Failed to connect".mysqli_connect_error();
 }
 
-$createDatabase = "CREATE DATABASE IF NOT EXISTS prototype2";
+$createDatabase = "CREATE DATABASE IF NOT EXISTS prototype2"; 
+//Change the database name -> do something different put p in caps or do prototype_2 
+//or something like that or dont add the number just do soemthign that not the same as this
 if(mysqli_query($conn, $createDatabase)) {
     // echo "Database already exists if not created"; 
 }
@@ -111,4 +113,5 @@ echo $json_data;
 mysqli_close($conn);
 
 ?>
+
 
