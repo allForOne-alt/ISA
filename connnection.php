@@ -107,11 +107,12 @@ if(!$row) {
 }
 
 $json_data = json_encode($row);
-header('Content-Type: application/json');
+header('Content-Type: application/json'); // This line can also be placed anywhere below line 6, so change it
 echo $json_data;
 
 mysqli_close($conn);
 
 ?>
+
 
 
