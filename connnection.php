@@ -44,7 +44,7 @@ if(isset($_GET['q'])) {
     $cityName = $_GET['q'];   
 }
 else {
-    $cityName = "Janakpur";
+    $cityName = "YOUR_ASSIGNED_CITY";
 }
 
 $selectAllData = "SELECT * FROM weather WHERE city = '$cityName'
@@ -111,3 +111,4 @@ echo $json_data;
 mysqli_close($conn);
 
 ?>
+
