@@ -1,4 +1,4 @@
-const api_key = "8e67b2065f4c070146565abbdcbc8616";
+const api_key = "API_KEY";
 let city = "janakpur";
 
 async function fetchWeatherData(searchCity) {
@@ -54,4 +54,5 @@ document.getElementById("searchButton").addEventListener("click", function() {
     } else {
         document.getElementById("errorMsg").innerHTML = "Please enter a city name.";
     }
+
 });
