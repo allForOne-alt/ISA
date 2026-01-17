@@ -2,71 +2,111 @@
 $serverName = "localhost";
 $userName = "root";
 $password = "";
-$api_key = "YOUR_API_KEY";
+$api_key = "8e67b2065f4c070146565abbdcbc8616";
 $conn = mysqli_connect($serverName, $userName, $password);
+
 if($conn) {
-    echo "Connection was successful<br>";
+    // echo "Connection was successful<br>";
 }
 else {
-    echo "Failed to connect".mysqli_connect_error();
+    // echo "Failed to connect".mysqli_connect_error();
 }
-// $createDatabase = "CREATE DATABASE IF NOT EXISTS prototype2";
-// if(mysqli_query($conn, $createDatabase)) {
-//     echo "Database already exists if not created <br>";
-// }
-// else {
-//     echo "Failed to create database<br>".mysqli_connect_error();
-// }
+
+$createDatabase = "CREATE DATABASE IF NOT EXISTS prototype2";
+if(mysqli_query($conn, $createDatabase)) {
+    // echo "Database already exists if not created"; 
+}
+else {
+    // echo "Failed to create database";
+}
 
 mysqli_select_db($conn, 'prototype2');
 
-// $createTable = "CREATE TABLE IF NOT EXISTS weather (
-// /*
-//   so basically the data from our table will be later converted to JSON format
-//   and then that data will be sent to the weather_forecast_api
-//  */
-//     humidity FLOAT NOT NULL,
-//     wind FLOAT NOT NULL,
-//     pressure FLOAT NOT NULL
-// );";
+$createTable = "CREATE TABLE IF NOT EXISTS weather (
+    city VARCHAR(100) NOT NULL,
+    humidity FLOAT NOT NULL,
+    wind FLOAT NOT NULL,
+    pressure FLOAT NOT NULL,
+    temperature FLOAT NOT NULL,
+    wind_direction FLOAT NOT NULL,
+    weather_description VARCHAR(255) NOT NULL,
+    weather_less2hr DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+)";
 
-// if (mysqli_query($conn, $createTable)) {
-//     echo "Table Created or already exists <br>";
-// }
-// else {
-//     echo "Failed to create database <br>".mysqli_connect_error();
-// }
-
-if(isset($_GET['q'])) {
-    /*
-    so basically this checks if the user passed a city name, for eg : if the user typed
-    jhapa then q = jhapa if not then q will default to kathmandu.
-    */
-    $cityName = $_GET['q'];   
-    echo $cityName;
+if (mysqli_query($conn, $createTable)) {
+    // echo "Table Created or already exists";
 }
 else {
-    $cityName = "Kathmandu";
+    // echo "Failed to create table:;
 }
 
-$selectAllData = "SELECT * FROM weather where city = '$cityName'";
+if(isset($_GET['q'])) {
+    $cityName = $_GET['q'];   
+}
+else {
+    $cityName = "Janakpur";
+}
+
+$selectAllData = "SELECT * FROM weather WHERE city = '$cityName'
+                AND weather_less2hr >= DATE_SUB(NOW(), INTERVAL 2 HOUR)
+                ORDER BY weather_less2hr DESC LIMIT 1";
+
 $result = mysqli_query($conn, $selectAllData);
+if($result === false) {
+    echo json_encode(["error" => "Query failed :".mysqli_error($conn)]);
+    mysqli_close($conn);
+    exit();
+}
+
+
 if(mysqli_num_rows($result)==0) {
-    $url = "https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${api_key}&units=metric";
+    $url = "https://api.openweathermap.org/data/2.5/weather?q={$cityName}&appid={$api_key}&units=metric";
     $response = file_get_contents($url);
+
+    if($response === false ) {
+        echo json_encode(["erro" => "Unable to fetch from openWeather". mysqli_error($conn)]); 
+        mysqli_close($conn);
+        exit();
+    }
+
     $data = json_decode($response, true);
+    
     $humidity = $data['main']['humidity'];
     $wind = $data['wind']['speed'];
     $pressure = $data['main']['pressure'];
+    $temperature = $data['main']['temp'];
+    $wind_direction = $data['wind']['deg'];
+    $weather_description = $data['weather'][0]['description'];
+    $city_name = $data['name'];
 
-$insertData = "Insert into weather (humidity, wind , pressure) VALUES ('$humidity', '$wind','$pressure')";
+    $insertData = "INSERT INTO weather (city, humidity, wind, pressure, temperature, wind_direction, weather_description, weather_less2hr) 
+                   VALUES ('$city_name', '$humidity', '$wind', '$pressure', '$temperature', '$wind_direction', '$weather_description', NOW())";
     
-    if(mysqli_query($conn, $insertData)) {
-        echo "Data inserted <br>";
+    if(!mysqli_query($conn, $insertData)) {
+        echo json_encode(["error" => "Failed to insert data: " . mysqli_error($conn)]);
+        exit();
     }
-    else {
-        echo "Failed to insert data".mysqli_error($conn);
+    
+    //newly inserted data 
+    $result = mysqli_query($conn, $selectAllData);
+    if($result === false) {
+        echo json_encode(["error" => "Failed to insert : ". mysqli_error($conn)]);
+        mysqli_close($conn);
+        exit();;
     }
 }
 
+//fetch data from ->->"database"<-<- 
+$row = mysqli_fetch_assoc($result);
+
+if(!$row) {
+    echo json_encode(["error" => "No data found for city: " . $cityName]);
+    exit();
+}
+
+$json_data = json_encode($row);
+header('Content-Type: application/json');
+echo $json_data;
+
+mysqli_close($conn);
 ?>
